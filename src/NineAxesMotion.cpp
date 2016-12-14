@@ -68,22 +68,33 @@ NineAxesMotion::NineAxesMotion()
 *Input Parameters: None
 *Return Parameter: None
 *******************************************************************************************/
-void NineAxesMotion::initSensor(unsigned int address)
+void NineAxesMotion::begin(unsigned int address)
 {
 	//Initialize the GPIO peripheral
 	pinMode(INT_PIN, INPUT_PULLUP);		//Configure Interrupt pin
 	pinMode(RESET_PIN, OUTPUT);			//Configure Reset pin
 
+	//Start Wire master
+	I2C_PORT.begin();
+
 	//Power on the BNO055
-	resetSensor(address);
+	reset(address);
 }
+
+void NineAxesMotion::begin(unsigned int address, int int_pin, int reset_pin)
+{
+	INT_PIN = int_pin;
+	RESET_PIN = reset_pin;
+	begin(address);
+}
+
 
 /*******************************************************************************************
 *Description: This function is used to reset the BNO055
 *Input Parameters: None
 *Return Parameter: None
 *******************************************************************************************/
-void NineAxesMotion::resetSensor(unsigned int address)
+void NineAxesMotion::reset(unsigned int address)
 {
 	//Reset sequence
 	digitalWrite(RESET_PIN, LOW);		//Set the Reset pin LOW
@@ -112,6 +123,226 @@ void NineAxesMotion::resetSensor(unsigned int address)
 
 	//Set the default data update mode to auto
 	dataUpdateMode = AUTO;
+}
+
+void NineAxesMotion::end()
+{
+
+}
+
+//accelerometer
+void NineAxesMotion::readAccelerometer(float& x, float& y, float& z)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateAccel();
+	}
+	x = accelData.x;
+	y = accelData.y;
+	z = accelData.z;
+}
+
+float NineAxesMotion::readAccelerometer(int axis)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateAccel();
+	}
+	if (axis == X_AXIS) {
+			return accelData.x;
+	} else if (axis == Y_AXIS) {
+			return accelData.y;
+	} else if (axis == Z_AXIS) {
+			return accelData.z;
+	}
+}
+
+void NineAxesMotion::readAccel(float& x, float& y, float& z)
+{
+	readAccelerometer(x, y, z);
+}
+
+float NineAxesMotion::readAccel(int axis)
+{
+	return readAccelerometer(axis);
+}
+
+// Grav. Acceleration
+void NineAxesMotion::readGravAcceleration(float& x, float& y, float& z)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateGravAccel();
+	}
+	x = gravAccelData.x;
+	y = gravAccelData.y;
+	z = gravAccelData.z;
+}
+
+float NineAxesMotion::readGravAcceleration(int axis)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateAccel();
+	}
+	if (axis == X_AXIS) {
+			return gravAccelData.x;
+	} else if (axis == Y_AXIS) {
+			return gravAccelData.y;
+	} else if (axis == Z_AXIS) {
+			return gravAccelData.z;
+	}
+}
+
+void NineAxesMotion::readGravAccel(float& x, float& y, float& z)
+{
+	readGravAcceleration(x, y, z);
+}
+
+float NineAxesMotion::readGravAccel(int axis)
+{
+	return readGravAcceleration(axis);
+}
+
+//Linear Acceleration
+void NineAxesMotion::readLinearAcceleration(float& x, float& y, float& z)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateLinearAccel();
+	}
+	x = gravAccelData.x;
+	y = gravAccelData.y;
+	z = gravAccelData.z;
+}
+
+float NineAxesMotion::readLinearAcceleration(int axis)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateAccel();
+	}
+	if (axis == X_AXIS) {
+			return linearAccelData.x;
+	} else if (axis == Y_AXIS) {
+			return linearAccelData.y;
+	} else if (axis == Z_AXIS) {
+			return linearAccelData.z;
+	}
+}
+
+void NineAxesMotion::readLinearAccel(float& x, float& y, float& z)
+{
+	readLinearAcceleration(x, y, z);
+}
+
+float NineAxesMotion::readLinearAccel(int axis)
+{
+	return readLinearAcceleration(axis);
+}
+
+//Gyroscope
+void NineAxesMotion::readGyro(float& x, float& y, float& z)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateGyro();
+	}
+	x = gyroData.x;
+	y = gyroData.y;
+	z = gyroData.z;
+}
+
+float NineAxesMotion::readGyro(int axis)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateGyro();
+	}
+	if (axis == X_AXIS) {
+			return gyroData.x;
+	} else if (axis == Y_AXIS) {
+			return gyroData.y;
+	} else if (axis == Z_AXIS) {
+			return gyroData.z;
+	}
+}
+
+//Magnetometer
+void NineAxesMotion::readMagnetometer(float& x, float& y, float& z)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateMag();
+	}
+	x = magData.x;
+	y = magData.y;
+	z = magData.z;
+}
+
+float NineAxesMotion::readMagnetometer(int axis)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateMag();
+	}
+	if (axis == X_AXIS) {
+			return magData.x;
+	} else if (axis == Y_AXIS) {
+			return magData.y;
+	} else if (axis == Z_AXIS) {
+			return magData.z;
+	}
+}
+
+void NineAxesMotion::readMag(float& x, float& y, float& z)
+{
+	readMagnetometer(x, y, z);
+}
+
+float NineAxesMotion::readMag(int axis)
+{
+	return readMagnetometer(axis);
+}
+
+/* Quaternion */
+void NineAxesMotion::readQuaternion(int16_t& w, int16_t& x, int16_t& y, int16_t& z)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateQuat();
+	}
+	w = quatData.w;
+	x = quatData.x;
+	y = quatData.y;
+	z = quatData.z;
+}
+
+int16_t NineAxesMotion::readQuaternion(int axis)
+{
+	if (dataUpdateMode == AUTO)
+	{
+		updateQuat();
+	}
+	if (axis == X_QUAT) {
+			return quatData.x;
+	} else if (axis == Y_QUAT) {
+			return quatData.y;
+	} else if (axis == Z_QUAT) {
+			return quatData.z;
+	}	else if (axis == W_QUAT) {
+			return quatData.w;
+	}
+}
+
+void NineAxesMotion::readQuat(int16_t& w, int16_t& x, int16_t& y, int16_t& z)
+{
+	readQuaternion(w, x, y, z);
+}
+
+int16_t NineAxesMotion::readQuat(int axis)
+{
+		return readQuaternion(axis);
 }
 
 /*******************************************************************************************
@@ -965,14 +1196,14 @@ uint8_t NineAxesMotion::readAccelPowerMode(void)
 signed char BNO055_I2C_bus_read(unsigned char dev_addr,unsigned char reg_addr, unsigned char *reg_data, unsigned char cnt)
 {
 	BNO055_RETURN_FUNCTION_TYPE comres = BNO055_ZERO_U8X;
-	I2C.beginTransmission(dev_addr);	//Start of transmission
-	I2C.write(reg_addr);				//Desired start register
-	comres = I2C.endTransmission();		//Stop of transmission
+	I2C_PORT.beginTransmission(dev_addr);	//Start of transmission
+	I2C_PORT.write(reg_addr);				//Desired start register
+	comres = I2C_PORT.endTransmission();		//Stop of transmission
 	delayMicroseconds(150);				//Caution Delay
-	I2C.requestFrom(dev_addr, cnt);		//Request data
-	while(I2C.available())				//The slave device may send less than requested (burst read)
+	I2C_PORT.requestFrom(dev_addr, cnt);		//Request data
+	while(I2C_PORT.available())				//The slave device may send less than requested (burst read)
 	{
-		*reg_data = I2C.read();			//Receive a byte
+		*reg_data = I2C_PORT.read();			//Receive a byte
 		reg_data++;						//Increment pointer
 	}
 	return comres;
@@ -982,14 +1213,14 @@ signed char BNO055_I2C_bus_read(unsigned char dev_addr,unsigned char reg_addr, u
 signed char BNO055_I2C_bus_write(unsigned char dev_addr,unsigned char reg_addr, unsigned char *reg_data, unsigned char cnt)
 {
 	BNO055_RETURN_FUNCTION_TYPE comres = BNO055_ZERO_U8X;
-	I2C.beginTransmission(dev_addr);	//Start of transmission
-	I2C.write(reg_addr);				//Desired start register
+	I2C_PORT.beginTransmission(dev_addr);	//Start of transmission
+	I2C_PORT.write(reg_addr);				//Desired start register
 	for(unsigned char index = 0; index < cnt; index++) //Note that the BNO055 supports burst write
 	{
-		I2C.write(*reg_data);			//Write the data
+		I2C_PORT.write(*reg_data);			//Write the data
 		reg_data++;						//Increment pointer
 	}
-	comres = I2C.endTransmission();		//Stop of transmission
+	comres = I2C_PORT.endTransmission();		//Stop of transmission
 	delayMicroseconds(150);				//Caution Delay
 	return comres;
 }
@@ -1000,227 +1231,3 @@ void _delay(u_32 period)
 }
 
 
-void NineAxesMotion::begin(unsigned int address = 0x28)
-{
-	initSensor(address);
-}
-
-void NineAxesMotion::end()
-{
-
-}
-
-//accelerometer
-void NineAxesMotion::readAccelerometer(float& x, float& y, float& z)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateAccel();
-	}
-	x = accelData.x;
-	y = accelData.y;
-	z = accelData.z;
-}
-
-float NineAxesMotion::readAccelerometer(int axis)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateAccel();
-	}
-	if (axis == X_AXIS) {
-			return accelData.x;
-	} else if (axis == Y_AXIS) {
-			return accelData.y;
-	} else if (axis == Z_AXIS) {
-			return accelData.z;
-	}
-}
-
-void NineAxesMotion::readAccel(float& x, float& y, float& z)
-{
-	readAccelerometer(x, y, z);
-}
-
-float NineAxesMotion::readAccel(int axis)
-{
-	return readAccelerometer(axis);
-}
-
-// Grav. Acceleration
-void NineAxesMotion::readGravAcceleration(float& x, float& y, float& z)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateGravAccel();
-	}
-	x = gravAccelData.x;
-	y = gravAccelData.y;
-	z = gravAccelData.z;
-}
-
-float NineAxesMotion::readGravAcceleration(int axis)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateAccel();
-	}
-	if (axis == X_AXIS) {
-			return gravAccelData.x;
-	} else if (axis == Y_AXIS) {
-			return gravAccelData.y;
-	} else if (axis == Z_AXIS) {
-			return gravAccelData.z;
-	}
-}
-
-void NineAxesMotion::readGravAccel(float& x, float& y, float& z)
-{
-	readGravAcceleration(x, y, z);
-}
-
-float NineAxesMotion::readGravAccel(int axis)
-{
-	return readGravAcceleration(axis);
-}
-
-//Linear Acceleration
-void NineAxesMotion::readLinearAcceleration(float& x, float& y, float& z)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateLinearAccel();
-	}
-	x = gravAccelData.x;
-	y = gravAccelData.y;
-	z = gravAccelData.z;
-}
-
-float NineAxesMotion::readLinearAcceleration(int axis)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateAccel();
-	}
-	if (axis == X_AXIS) {
-			return linearAccelData.x;
-	} else if (axis == Y_AXIS) {
-			return linearAccelData.y;
-	} else if (axis == Z_AXIS) {
-			return linearAccelData.z;
-	}
-}
-
-void NineAxesMotion::readLinearAccel(float& x, float& y, float& z)
-{
-	readLinearAcceleration(x, y, z);
-}
-
-float NineAxesMotion::readLinearAccel(int axis)
-{
-	return readLinearAcceleration(axis);
-}
-
-//Gyroscope
-void NineAxesMotion::readGyro(float& x, float& y, float& z)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateGyro();
-	}
-	x = gyroData.x;
-	y = gyroData.y;
-	z = gyroData.z;
-}
-
-float NineAxesMotion::readGyro(int axis)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateGyro();
-	}
-	if (axis == X_AXIS) {
-			return gyroData.x;
-	} else if (axis == Y_AXIS) {
-			return gyroData.y;
-	} else if (axis == Z_AXIS) {
-			return gyroData.z;
-	}
-}
-
-//Magnetometer
-void NineAxesMotion::readMagnetometer(float& x, float& y, float& z)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateMag();
-	}
-	x = magData.x;
-	y = magData.y;
-	z = magData.z;
-}
-
-float NineAxesMotion::readMagnetometer(int axis)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateMag();
-	}
-	if (axis == X_AXIS) {
-			return magData.x;
-	} else if (axis == Y_AXIS) {
-			return magData.y;
-	} else if (axis == Z_AXIS) {
-			return magData.z;
-	}
-}
-
-void NineAxesMotion::readMag(float& x, float& y, float& z)
-{
-	readMagnetometer(x, y, z);
-}
-
-float NineAxesMotion::readMag(int axis)
-{
-	return readMagnetometer(axis);
-}
-
-/* Quaternion */
-void NineAxesMotion::readQuaternion(int16_t& w, int16_t& x, int16_t& y, int16_t& z)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateQuat();
-	}
-	w = quatData.w;
-	x = quatData.x;
-	y = quatData.y;
-	z = quatData.z;
-}
-
-int16_t NineAxesMotion::readQuaternion(int axis)
-{
-	if (dataUpdateMode == AUTO)
-	{
-		updateQuat();
-	}
-	if (axis == X_QUAT) {
-			return quatData.x;
-	} else if (axis == Y_QUAT) {
-			return quatData.y;
-	} else if (axis == Z_QUAT) {
-			return quatData.z;
-	}	else if (axis == W_QUAT) {
-			return quatData.w;
-	}
-}
-
-void NineAxesMotion::readQuat(int16_t& w, int16_t& x, int16_t& y, int16_t& z)
-{
-	readQuaternion(w, x, y, z);
-}
-
-int16_t NineAxesMotion::readQuat(int axis)
-{
-		return readQuaternion(axis);
-}
